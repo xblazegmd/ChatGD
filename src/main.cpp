@@ -1,6 +1,7 @@
 #include <Geode/Geode.hpp>
 #include <Geode/modify/PlayLayer.hpp>
 #include <Geode/modify/PauseLayer.hpp>
+#include <Geode/modify/MenuLayer.hpp>
 #include "ChatConfigPopup.hpp"
 
 using namespace geode::prelude;
