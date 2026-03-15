@@ -15,7 +15,9 @@ bool loadDisabledForLevel(int levelID, const char* suffix, bool defaultValue) {
     return Mod::get()->getSavedValue<bool>(key, defaultValue);
 }
 
-bool ChatConfigPopup::setup() {
+bool ChatConfigPopup::init(float width, float height) {
+    if (!Popup::init(width, height))
+        return false;
     this->setTitle("ChatGD Config");
     auto center = m_mainLayer->getContentSize() / 2;
 
@@ -107,13 +109,18 @@ void ChatConfigPopup::onClose(CCObject* sender) {
 
     int levelID = playLayer->m_level->m_levelID;
 
-    Mod::get()->setSavedValue(levelKey(levelID, "hold-percent"),
-        geode::utils::numFromString<float>(m_textInput1->getString()).unwrapOrDefault());
-    Mod::get()->setSavedValue(levelKey(levelID, "go-percent"),
-        geode::utils::numFromString<float>(m_textInput2->getString()).unwrapOrDefault());
-    Mod::get()->setSavedValue(levelKey(levelID, "supergo-percent"),
-        geode::utils::numFromString<float>(m_textInput3->getString()).unwrapOrDefault());
-    Mod::get()->setSavedValue(levelKey(levelID, "enabled"), !m_enableToggle->isToggled());
+   if (m_textInput1)
+        Mod::get()->setSavedValue(levelKey(levelID, "hold-percent"),
+            geode::utils::numFromString<float>(m_textInput1->getString()).unwrapOrDefault());
+    if (m_textInput2)
+        Mod::get()->setSavedValue(levelKey(levelID, "go-percent"),
+            geode::utils::numFromString<float>(m_textInput2->getString()).unwrapOrDefault());
+    if (m_textInput3)
+        Mod::get()->setSavedValue(levelKey(levelID, "supergo-percent"),
+            geode::utils::numFromString<float>(m_textInput3->getString()).unwrapOrDefault());
+    if (m_enableToggle)
+        Mod::get()->setSavedValue(levelKey(levelID, "enabled"), !m_enableToggle->isToggled());
+
 
     geode::Popup::onClose(sender);
 }
