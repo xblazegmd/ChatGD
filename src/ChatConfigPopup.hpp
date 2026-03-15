@@ -16,7 +16,7 @@ protected:
     geode::TextInput* m_textInput3 = nullptr;
     CCMenuItemToggler* m_enableToggle = nullptr;
 
-    bool setup();
+    bool init(float width, float height);
     void onToggle(CCObject*);
 
 public:
