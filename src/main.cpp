@@ -467,7 +467,7 @@ public:
                 addChatMessage(messages[rand() % messages.size()]);
                 fields->m_randomChatTimer = 0;
                 float t = (progress - fields->holdPercent) / (fields->goPercent - fields->holdPercent);
-                fields->m_nextChatDelay = 0.3f - (t * 0.25f);
+                fields->m_nextChatDelay = 0.2f - (t * 0.067f);
             }
         }
         // gooo
@@ -493,7 +493,7 @@ public:
                 addChatMessage(messages[rand() % messages.size()]);
                 fields->m_randomChatTimer = 0;
                 float t = (progress - fields->goPercent) / (fields->superGoPercent - fields->goPercent);
-                fields->m_nextChatDelay = 0.2f - (t * 0.17f);
+                fields->m_nextChatDelay = 0.133f - (t * 0.033f);
             }
         }
         // super go
@@ -521,7 +521,7 @@ public:
                 addChatMessage(messages[rand() % messages.size()]);
                 fields->m_randomChatTimer = 0;
                 float t = (progress - fields->superGoPercent) / (99.9999f - fields->superGoPercent);
-                fields->m_nextChatDelay = 0.15f - (t * 0.14f);
+                fields->m_nextChatDelay = 0.1f - (t * 0.033f);
             }
         }
         // 100%: gg
@@ -549,7 +549,7 @@ public:
                 };
                 addChatMessage(messages[rand() % messages.size()]);
                 fields->m_randomChatTimer = 0;
-                fields->m_nextChatDelay = 0.1f + (rand() % 3) / 10.0f;
+                fields->m_nextChatDelay = 0.033f + (rand() % 18) / 1000.0f;
             }
         }
     }
