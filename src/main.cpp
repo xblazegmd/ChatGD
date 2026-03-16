@@ -637,7 +637,7 @@ class $modify(MenuLayer) {
             }
             std::sort(GD_PLAYERS.begin(), GD_PLAYERS.end());
 
-            auto raw = Mod::get()->getSettingValue<std::string>("custom-custom-chatters");
+            auto raw = Mod::get()->getSettingValue<std::string>("custom-chatters");
             std::stringstream ss(raw);
             std::string name;
             while (std::getline(ss, name, ' ')) {
