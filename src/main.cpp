@@ -75,9 +75,9 @@ static std::string chat(const std::string& msg) {
     return randomPlayer() + ": " + msg;
 }
 
-static std::string wrapText(const std::string& msg, int maxChars = 22) {
+static std::string wrapText(const std::string& msg, int maxChars = 25, int firstLineOffset = 0) {
     std::string result;
-    int lineLen = 0;
+    int lineLen = firstLineOffset;
     for (size_t i = 0; i < msg.size(); ) {
         size_t wordEnd = msg.find(' ', i);
         if (wordEnd == std::string::npos) wordEnd = msg.size();
@@ -85,6 +85,11 @@ static std::string wrapText(const std::string& msg, int maxChars = 22) {
 
         while ((int)word.size() > maxChars) {
             int space = maxChars - lineLen;
+            if (space <= 0) {
+                if (!result.empty()) result += '\n';
+                lineLen = 0;
+                continue;
+            }
             if (!result.empty() && lineLen > 0) result += '\n';
             result += word.substr(0, space);
             word = word.substr(space);
@@ -351,7 +356,7 @@ public:
             cursorX = nameLabel->getContentSize().width * TEXT_SCALE;
         }
 
-        std::string wrapped = wrapText(msg.text, 22);
+        std::string wrapped = wrapText(msg.text, 25, msg.username.size() + 2);
         auto textLabel = CCLabelBMFont::create(wrapped.c_str(), "bigFont.fnt");
         textLabel->setScale(TEXT_SCALE);
         textLabel->setColor({210, 210, 210});
