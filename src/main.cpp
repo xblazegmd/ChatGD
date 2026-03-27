@@ -309,7 +309,7 @@ public:
         float maxY = MSG_AREA_HEIGHT - CHAT_PADDING;
         float y = CHAT_PADDING;
 
-        for (int i = (int)fields->m_messageRows.size() - 1; i >= 0; i--) {
+        for (int i = 0; i < (int)fields->m_messageRows.size(); i++) {
             float rowTop = y + fields->m_rowHeights[i] * MSG_LINE_HEIGHT;
             if (rowTop > maxY) {
                 fields->m_messageRows[i]->setVisible(false);
@@ -330,9 +330,9 @@ public:
         // lwk fried fix but eh it works lol
         while (totalHeight > maxY && !fields->m_messageRows.empty()) {
             totalHeight -= fields->m_rowHeights.back() * MSG_LINE_HEIGHT;
-            fields->m_msgContainer->removeChild(fields->m_messageRows.back(), true);
-            fields->m_messageRows.pop_back();
-            fields->m_rowHeights.pop_back();
+            fields->m_msgContainer->removeChild(fields->m_messageRows.front(), true);
+            fields->m_messageRows.erase(fields->m_messageRows.begin());
+            fields->m_rowHeights.erase(fields->m_rowHeights.begin());
         }
     }
 
@@ -368,8 +368,10 @@ public:
         for (char c : wrapped) if (c == '\n') lineCount++;
 
         fields->m_msgContainer->addChild(row);
-        fields->m_messageRows.insert(fields->m_messageRows.begin(), row);
-        fields->m_rowHeights.insert(fields->m_rowHeights.begin(), lineCount);
+        //fields->m_messageRows.insert(fields->m_messageRows.begin(), row);
+        // fields->m_rowHeights.insert(fields->m_rowHeights.begin(), lineCount);
+        fields->m_messageRows.push_back(row);
+        fields->m_rowHeights.push_back(lineCount);
 
         trimOverflow();
         rebuildLayout();
