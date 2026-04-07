@@ -75,9 +75,9 @@ static std::string chat(const std::string& msg) {
     return randomPlayer() + ": " + msg;
 }
 
-static std::string wrapText(const std::string& msg, int maxChars = 22) {
+static std::string wrapText(const std::string& msg, int maxChars = 25, int firstLineOffset = 0) {
     std::string result;
-    int lineLen = 0;
+    int lineLen = firstLineOffset;
     for (size_t i = 0; i < msg.size(); ) {
         size_t wordEnd = msg.find(' ', i);
         if (wordEnd == std::string::npos) wordEnd = msg.size();
@@ -85,6 +85,11 @@ static std::string wrapText(const std::string& msg, int maxChars = 22) {
 
         while ((int)word.size() > maxChars) {
             int space = maxChars - lineLen;
+            if (space <= 0) {
+                if (!result.empty()) result += '\n';
+                lineLen = 0;
+                continue;
+            }
             if (!result.empty() && lineLen > 0) result += '\n';
             result += word.substr(0, space);
             word = word.substr(space);
@@ -213,12 +218,13 @@ class $modify(MyPlayLayer, PlayLayer) {
         float superGoPercent = 80.0f;
         float ggPercent = 99.9999f;
         int att = 0;
-        bool enabled = true;
+        bool enabled = false;
         bool m_echoClipPresent = false;
         bool m_clipMessageFired = false;
         float m_bestPercent = 0.0f;
         float m_idleChatTimer = 0.0f;
         float m_nextIdleDelay = 2.8f;
+        int m_numViewers = 69;
     };
 
 public:
@@ -229,7 +235,8 @@ public:
         fields->goPercent = loadPercentForLevel(m_level->m_levelID, "go-percent", 37.0f);
         fields->superGoPercent = loadPercentForLevel(m_level->m_levelID, "supergo-percent", 80.0f);
         fields->ggPercent = loadPercentForLevel(m_level->m_levelID, "gg-percent", 99.9999f);
-        fields->enabled = loadDisabledForLevel(m_level->m_levelID, "enabled", true);
+        fields->enabled = loadDisabledForLevel(m_level->m_levelID, "enabled", false);
+        fields->m_numViewers = Mod::get()->getSettingValue<int>("viewer-count");
     }
 
     bool init(GJGameLevel* level, bool useReplay, bool dontCreateObjects) {
@@ -243,8 +250,8 @@ public:
 
         auto winSize = CCDirector::sharedDirector()->getWinSize();
 
-        float chatX = winSize.width - CHAT_WIDTH - 5.0f;
-        float chatY = 5.0f;
+        float chatX = winSize.width - CHAT_WIDTH - 5.0f + Mod::get()->getSettingValue<int>("x-off");
+        float chatY = 5.0f + Mod::get()->getSettingValue<int>("y-off");
 
         // chat root node
         fields->m_chatRoot = CCNode::create();
@@ -283,6 +290,14 @@ public:
         fields->m_headerLabel->setPosition({CHAT_PADDING + 24.0f, CHAT_HEIGHT - HEADER_HEIGHT / 2.0f});
         fields->m_chatRoot->addChild(fields->m_headerLabel);
 
+        // viewer count
+        fields->m_headerLabel = CCLabelBMFont::create(std::to_string(fields->m_numViewers).c_str(), "bigFont.fnt"); // this is stupid... for the reviewing staff pls give a better way to do ts (i am very sorry if this causes you pain)
+        fields->m_headerLabel->setScale(0.22f);
+        fields->m_headerLabel->setColor({151, 18, 17});
+        fields->m_headerLabel->setAnchorPoint({0.0f, 0.5f});
+        fields->m_headerLabel->setPosition({CHAT_WIDTH - 35.0f, CHAT_HEIGHT - HEADER_HEIGHT / 2.0f});
+        fields->m_chatRoot->addChild(fields->m_headerLabel);
+
         // msg container
         fields->m_msgContainer = CCNode::create();
         fields->m_msgContainer->setPosition({0, 0});
@@ -304,7 +319,7 @@ public:
         float maxY = MSG_AREA_HEIGHT - CHAT_PADDING;
         float y = CHAT_PADDING;
 
-        for (int i = (int)fields->m_messageRows.size() - 1; i >= 0; i--) {
+        for (int i = 0; i < (int)fields->m_messageRows.size(); i++) {
             float rowTop = y + fields->m_rowHeights[i] * MSG_LINE_HEIGHT;
             if (rowTop > maxY) {
                 fields->m_messageRows[i]->setVisible(false);
@@ -325,9 +340,9 @@ public:
         // lwk fried fix but eh it works lol
         while (totalHeight > maxY && !fields->m_messageRows.empty()) {
             totalHeight -= fields->m_rowHeights.back() * MSG_LINE_HEIGHT;
-            fields->m_msgContainer->removeChild(fields->m_messageRows.back(), true);
-            fields->m_messageRows.pop_back();
-            fields->m_rowHeights.pop_back();
+            fields->m_msgContainer->removeChild(fields->m_messageRows.front(), true);
+            fields->m_messageRows.erase(fields->m_messageRows.begin());
+            fields->m_rowHeights.erase(fields->m_rowHeights.begin());
         }
     }
 
@@ -351,7 +366,7 @@ public:
             cursorX = nameLabel->getContentSize().width * TEXT_SCALE;
         }
 
-        std::string wrapped = wrapText(msg.text, 22);
+        std::string wrapped = wrapText(msg.text, 25, msg.username.size() + 2);
         auto textLabel = CCLabelBMFont::create(wrapped.c_str(), "bigFont.fnt");
         textLabel->setScale(TEXT_SCALE);
         textLabel->setColor({210, 210, 210});
@@ -363,8 +378,10 @@ public:
         for (char c : wrapped) if (c == '\n') lineCount++;
 
         fields->m_msgContainer->addChild(row);
-        fields->m_messageRows.insert(fields->m_messageRows.begin(), row);
-        fields->m_rowHeights.insert(fields->m_rowHeights.begin(), lineCount);
+        //fields->m_messageRows.insert(fields->m_messageRows.begin(), row);
+        // fields->m_rowHeights.insert(fields->m_rowHeights.begin(), lineCount);
+        fields->m_messageRows.push_back(row);
+        fields->m_rowHeights.push_back(lineCount);
 
         trimOverflow();
         rebuildLayout();
@@ -467,7 +484,7 @@ public:
                 addChatMessage(messages[rand() % messages.size()]);
                 fields->m_randomChatTimer = 0;
                 float t = (progress - fields->holdPercent) / (fields->goPercent - fields->holdPercent);
-                fields->m_nextChatDelay = 0.2f - (t * 0.067f);
+                fields->m_nextChatDelay = 0.2f - (t * 0.067f) / 100.0f * fields->m_numViewers; // DONT ASK WHY IT JUST IS
             }
         }
         // gooo
@@ -493,7 +510,7 @@ public:
                 addChatMessage(messages[rand() % messages.size()]);
                 fields->m_randomChatTimer = 0;
                 float t = (progress - fields->goPercent) / (fields->superGoPercent - fields->goPercent);
-                fields->m_nextChatDelay = 0.133f - (t * 0.033f);
+                fields->m_nextChatDelay = 0.133f - (t * 0.033f) / 100.0f * fields->m_numViewers;
             }
         }
         // super go
@@ -521,7 +538,7 @@ public:
                 addChatMessage(messages[rand() % messages.size()]);
                 fields->m_randomChatTimer = 0;
                 float t = (progress - fields->superGoPercent) / (99.9999f - fields->superGoPercent);
-                fields->m_nextChatDelay = 0.1f - (t * 0.033f);
+                fields->m_nextChatDelay = 0.1f - (t * 0.033f) / 100.0f * fields->m_numViewers;
             }
         }
         // 100%: gg
@@ -549,7 +566,7 @@ public:
                 };
                 addChatMessage(messages[rand() % messages.size()]);
                 fields->m_randomChatTimer = 0;
-                fields->m_nextChatDelay = 0.033f + (rand() % 18) / 1000.0f;
+                fields->m_nextChatDelay = 0.033f + (rand() % 18) / 1000.0f / 100.0f * fields->m_numViewers;
             }
         }
     }
@@ -584,7 +601,7 @@ public:
             fields->m_isDeathSpamming = true;
             float t = progress / 100.0f;
             fields->m_deathSpamDuration = 2.0f + (t * t * 12.0f);
-            fields->m_nextChatDelay = 0.5f - (t * 0.49f);
+            fields->m_nextChatDelay = 0.5f - (t * 0.49f) / 100 * fields->m_numViewers;
         }
         fields->att += 1;
         fields->m_clipMessageFired = false;

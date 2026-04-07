@@ -7,6 +7,9 @@
 - added every single geode mod dev to the list of chatters also at the request of dominokiddoo
 - customizable gg %
 - customizable chatters
+- chat on by default
+- customizable chat pos
+- viewer count thats customizable
 ## v1.0.1
 - Removed debug logs
 - Fixed readme
