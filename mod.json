@@ -8,7 +8,7 @@
 	},
 	"id": "memeking16.chatgd",
 	"name": "ChatGD",
-	"version": "v1.1.0",
+	"version": "v1.1.1",
 	"developers": [
 		"MEMEKING16",
 		"Axiom"
@@ -54,10 +54,11 @@
 		"viewer-count": {
 			"name": "Viewer Count",
 			"type": "int",
-			"default": 100
+			"default": 100,
+			"min": 0
 		},
 		"enabled-by-default": {
-			"name": "Viewer Count",
+			"name": "Is Enabled by Default",
 			"type": "bool",
 			"default": true
 		}

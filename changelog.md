@@ -1,4 +1,7 @@
 # ChatGD Changelog
+## v1.1.1
+- you cant make viewer count negative anymore
+- put a proper name for enabled on default
 ## v1.1.0
 - improved ui heavily
 - added more messages and users
