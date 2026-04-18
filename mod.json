@@ -60,6 +60,12 @@
 			"name": "Is Enabled by Default",
 			"type": "bool",
 			"default": true
+		},
+		"font": {
+			"name": "Font",
+			"type": "string",
+			"one-of": ["bigFont", "gjFont01", "gjFont02", "gjFont03", "gjFont04", "gjFont05", "gjFont06", "gjFont07", "gjFont08", "gjFont09", "gjFont10", "gjFont11", "gjFont12", "gjFont13", "gjFont14", "gjFont15", "gjFont16", "gjFont17", "gjFont18", "gjFont19", "gjFont20", "gjFont21", "gjFont22", "gjFont23", "gjFont24", "gjFont25", "gjFont26", "gjFont27", "gjFont28", "gjFont29", "gjFont30", "gjFont31", "gjFont32", "gjFont33", "gjFont34", "gjFont35", "gjFont36", "gjFont37", "gjFont38", "gjFont39", "gjFont40", "gjFont41", "gjFont42", "gjFont43", "gjFont44", "gjFont45", "gjFont46", "gjFont47", "gjFont48", "gjFont49", "gjFont50", "gjFont51", "gjFont52", "gjFont53", "gjFont54", "gjFont55", "gjFont56", "gjFont57", "gjFont58", "gjFont59", "gjFont60"],
+			"default": "bigFont"
 		}
     }
 }
