@@ -225,6 +225,7 @@ class $modify(MyPlayLayer, PlayLayer) {
         float m_idleChatTimer = 0.0f;
         float m_nextIdleDelay = 2.8f;
         int m_numViewers = 69;
+        std::string m_font = "bigFont";
     };
 
 public:
@@ -237,6 +238,7 @@ public:
         fields->ggPercent = loadPercentForLevel(m_level->m_levelID, "gg-percent", 99.9999f);
         fields->enabled = loadDisabledForLevel(m_level->m_levelID, "enabled", Mod::get()->getSettingValue<int>("enabled-by-default"));
         fields->m_numViewers = Mod::get()->getSettingValue<int>("viewer-count");
+        fields->m_font = Mod::get()->getSettingValue<std::string>("font") + ".fnt";
     }
 
     bool init(GJGameLevel* level, bool useReplay, bool dontCreateObjects) {
@@ -275,7 +277,7 @@ public:
         fields->m_chatRoot->addChild(fields->m_liveBadge);
 
         // live text
-        fields->m_liveLabel = CCLabelBMFont::create("LIVE", "bigFont.fnt");
+        fields->m_liveLabel = CCLabelBMFont::create("LIVE", fields->m_font.c_str());
         fields->m_liveLabel->setScale(0.14f);
         fields->m_liveLabel->setColor({255, 255, 255});
         fields->m_liveLabel->setAnchorPoint({0.5f, 0.5f});
@@ -283,7 +285,7 @@ public:
         fields->m_chatRoot->addChild(fields->m_liveLabel);
 
         // header label
-        fields->m_headerLabel = CCLabelBMFont::create("CHAT", "bigFont.fnt");
+        fields->m_headerLabel = CCLabelBMFont::create("CHAT", fields->m_font.c_str());
         fields->m_headerLabel->setScale(0.22f);
         fields->m_headerLabel->setColor({255, 255, 255});
         fields->m_headerLabel->setAnchorPoint({0.0f, 0.5f});
@@ -291,7 +293,7 @@ public:
         fields->m_chatRoot->addChild(fields->m_headerLabel);
 
         // viewer count
-        fields->m_headerLabel = CCLabelBMFont::create(std::to_string(fields->m_numViewers).c_str(), "bigFont.fnt"); // this is stupid... for the reviewing staff pls give a better way to do ts (i am very sorry if this causes you pain)
+        fields->m_headerLabel = CCLabelBMFont::create(std::to_string(fields->m_numViewers).c_str(), fields->m_font.c_str()); // this is stupid... for the reviewing staff pls give a better way to do ts (i am very sorry if this causes you pain)
         fields->m_headerLabel->setScale(0.22f);
         fields->m_headerLabel->setColor({151, 18, 17});
         fields->m_headerLabel->setAnchorPoint({0.0f, 0.5f});
@@ -357,7 +359,7 @@ public:
 
         if (!msg.username.empty()) {
             std::string nameStr = msg.username + ": ";
-            auto nameLabel = CCLabelBMFont::create(nameStr.c_str(), "bigFont.fnt");
+            auto nameLabel = CCLabelBMFont::create(nameStr.c_str(), fields->m_font.c_str());
             nameLabel->setScale(TEXT_SCALE);
             nameLabel->setColor(colorForUsername(msg.username));
             nameLabel->setAnchorPoint({0.0f, 0.0f});
@@ -367,7 +369,7 @@ public:
         }
 
         std::string wrapped = wrapText(msg.text, 25, msg.username.size() + 2);
-        auto textLabel = CCLabelBMFont::create(wrapped.c_str(), "bigFont.fnt");
+        auto textLabel = CCLabelBMFont::create(wrapped.c_str(), fields->m_font.c_str());
         textLabel->setScale(TEXT_SCALE);
         textLabel->setColor({210, 210, 210});
         textLabel->setAnchorPoint({0.0f, 0.0f});
