@@ -199,7 +199,7 @@ static const std::vector<std::string> START_MESSAGES = {
 
 class $modify(MyPlayLayer, PlayLayer) {
     struct Fields {
-        CCNode* m_chatRoot = nullptr;
+        CCNodeRGBA* m_chatRoot = nullptr;
         CCLayerColor* m_chatBg = nullptr;
         CCLayerColor* m_header = nullptr;
         CCLabelBMFont* m_headerLabel = nullptr;
@@ -226,6 +226,7 @@ class $modify(MyPlayLayer, PlayLayer) {
         float m_nextIdleDelay = 2.8f;
         int m_numViewers = 69;
         float m_lastAttPercent = 0.0f;
+        float m_opacity = 1.0f;
         GJGameLevel* m_lvl;
         std::string m_font = "bigFont";
     };
@@ -241,6 +242,7 @@ public:
         fields->enabled = loadDisabledForLevel(m_level->m_levelID, "enabled", Mod::get()->getSettingValue<int>("enabled-by-default"));
         fields->m_numViewers = Mod::get()->getSettingValue<int>("viewer-count");
         fields->m_font = Mod::get()->getSettingValue<std::string>("font") + ".fnt";
+        fields->m_opacity = Mod::get()->getSettingValue<float>("opacity");
     }
 
     bool init(GJGameLevel* level, bool useReplay, bool dontCreateObjects) {
@@ -260,7 +262,7 @@ public:
         float chatY = 5.0f + Mod::get()->getSettingValue<int>("y-off");
 
         // chat root node
-        fields->m_chatRoot = CCNode::create();
+        fields->m_chatRoot = CCNodeRGBA::create();
         fields->m_chatRoot->setPosition({chatX, chatY});
         fields->m_chatRoot->setZOrder(100);
         this->m_uiLayer->addChild(fields->m_chatRoot);
@@ -268,16 +270,19 @@ public:
         // chat box bg
         fields->m_chatBg = CCLayerColor::create({14, 14, 18, 200}, CHAT_WIDTH, CHAT_HEIGHT);
         fields->m_chatBg->setPosition({0, 0});
+        fields->m_chatBg->setOpacity(static_cast<GLubyte>(fields->m_opacity*255));
         fields->m_chatRoot->addChild(fields->m_chatBg);
 
         // header bar
         fields->m_header = CCLayerColor::create({100, 55, 200, 255}, CHAT_WIDTH, HEADER_HEIGHT);
         fields->m_header->setPosition({0, CHAT_HEIGHT - HEADER_HEIGHT});
+        fields->m_header->setOpacity(static_cast<GLubyte>(fields->m_opacity*255));
         fields->m_chatRoot->addChild(fields->m_header);
 
         // live badge
         fields->m_liveBadge = CCLayerColor::create({230, 30, 30, 255}, 18.0f, 9.0f);
         fields->m_liveBadge->setPosition({CHAT_PADDING, CHAT_HEIGHT - HEADER_HEIGHT + 3.5f});
+        fields->m_liveBadge->setOpacity(static_cast<GLubyte>(fields->m_opacity*255));
         fields->m_chatRoot->addChild(fields->m_liveBadge);
 
         // live text
@@ -286,6 +291,7 @@ public:
         fields->m_liveLabel->setColor({255, 255, 255});
         fields->m_liveLabel->setAnchorPoint({0.5f, 0.5f});
         fields->m_liveLabel->setPosition({CHAT_PADDING + 9.0f, CHAT_HEIGHT - HEADER_HEIGHT + 8.0f});
+        fields->m_liveLabel->setOpacity(static_cast<GLubyte>(fields->m_opacity*255));
         fields->m_chatRoot->addChild(fields->m_liveLabel);
 
         // header label
@@ -294,6 +300,7 @@ public:
         fields->m_headerLabel->setColor({255, 255, 255});
         fields->m_headerLabel->setAnchorPoint({0.0f, 0.5f});
         fields->m_headerLabel->setPosition({CHAT_PADDING + 24.0f, CHAT_HEIGHT - HEADER_HEIGHT / 2.0f});
+        fields->m_headerLabel->setOpacity(static_cast<GLubyte>(fields->m_opacity*255));
         fields->m_chatRoot->addChild(fields->m_headerLabel);
 
         // viewer count
@@ -302,6 +309,7 @@ public:
         fields->m_headerLabel->setColor({151, 18, 17});
         fields->m_headerLabel->setAnchorPoint({0.0f, 0.5f});
         fields->m_headerLabel->setPosition({CHAT_WIDTH - 35.0f, CHAT_HEIGHT - HEADER_HEIGHT / 2.0f});
+        fields->m_headerLabel->setOpacity(static_cast<GLubyte>(fields->m_opacity*255));
         fields->m_chatRoot->addChild(fields->m_headerLabel);
 
         // msg container
