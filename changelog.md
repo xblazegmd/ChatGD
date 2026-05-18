@@ -1,4 +1,6 @@
 # ChatGD Changelog
+## v1.3.0
+- customizable opacity
 ## v1.2.0
 - new best msgs
 ## v1.1.2
